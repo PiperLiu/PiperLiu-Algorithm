@@ -1,4 +1,7 @@
 import pandas as pd
+import numpy as np
+from sklearn.cluster import k_means
+from sklearn import metrics
 
 def read(path):
     df = pd.read_hdf(path, '1.0')
@@ -12,7 +15,9 @@ def baselinePromote(train_df, test_df):
     temp.columns = ['buyer_admin_id', 'item_id', 'item_cnts']
     train_test = pd.merge(train_test, temp)
     train_test = train_test.sort_values(['buyer_admin_id', 'item_cnts', 'irank'])
-    train_test_t = train_test.drop_duplicates(subset=['buyer_admin_id', 'item_id'], keep='first')
+
+    train_test_t = train_test.loc[train_test.buyer_country_id == 'yy']
+    train_test_t = train_test_t.drop_duplicates(subset=['buyer_admin_id', 'item_id'], keep='first')
 
     item_hot = train_test_t.groupby(['item_id']).size().reset_index()
     item_hot.columns = ['item_id', 'cnts']
@@ -87,6 +92,12 @@ def baselinePromote(train_df, test_df):
     del temp['lst']
 
     return temp
+
+
+class K_means(object):
+    def __init__(self, n_clusters, train_df):
+        self.n_clusters = n_clusters.copy()
+        self.train = train_df.copy()
 
 
 if __name__ == '__main__':
